@@ -6,27 +6,44 @@
  */
 
 import React, {Component} from 'react';
-import {SafeAreaView, StyleSheet, Text} from 'react-native';
-import Field from './src/components/Field/Field';
+import {View, SafeAreaView, StyleSheet, Text} from 'react-native';
 import params from './src/utils/params';
+import {BoardProps, createMinedBoard} from './src/utils/logic';
+import MineField from './src/components/MineField/MineField';
 
-export default class App extends Component {
+type MyProps = {};
+type MyState = {board: BoardProps};
+
+export default class App extends Component<MyProps, MyState> {
+  constructor(props: any) {
+    super(props);
+    this.state = this.createState();
+  }
+
+  minesAmount = () => {
+    const rows = params.getRowsAmount();
+    const columns = params.getColumnsAmount();
+    return Math.ceil(rows * columns * params.difficultLevel);
+  };
+
+  createState = () => {
+    const rows = params.getRowsAmount();
+    const columns = params.getColumnsAmount();
+    return {
+      board: createMinedBoard(rows, columns, this.minesAmount()),
+    };
+  };
+
   render(): React.ReactNode {
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={styles.welcome}>Iniciando o Mines!</Text>
+        <Text>Iniciando o Mines!</Text>
         <Text>
           Tamanho da grade: {params.getRowsAmount()}x{params.getColumnsAmount()}
         </Text>
-        <Field />
-        <Field opened />
-        <Field opened nearMines={1} />
-        <Field opened nearMines={2} />
-        <Field opened nearMines={3} />
-        <Field opened nearMines={7} />
-        <Field mined />
-        <Field mined opened />
-        <Field mined opened exploded />
+        <View style={styles.board}>
+          <MineField board={this.state.board} />
+        </View>
       </SafeAreaView>
     );
   }
@@ -36,12 +53,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'F5FCFF',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+  board: {
+    alignItems: 'center',
+    backgroundColor: '#AAA',
   },
 });

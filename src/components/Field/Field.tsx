@@ -2,12 +2,14 @@ import React, {Component} from 'react';
 import {View, StyleSheet, TextStyle, ViewStyle, Text} from 'react-native';
 import params from '../../utils/params';
 import Mine from '../Mine/Mine';
+import Flag from '../Flag/Flag';
 
 type FieldProps = {
   mined?: boolean;
   opened?: boolean;
   nearMines?: number;
   exploded?: boolean;
+  flagged?: boolean;
 };
 
 export default class Field extends Component<FieldProps> {
@@ -21,6 +23,7 @@ export default class Field extends Component<FieldProps> {
       opened = false,
       nearMines = 0,
       exploded = false,
+      flagged = false,
     } = this.props;
 
     const styleField: TextStyle[] | ViewStyle[] = [styles.field];
@@ -31,7 +34,10 @@ export default class Field extends Component<FieldProps> {
     if (exploded) {
       styleField.push(styles.exploded);
     }
-    if (styleField.length === 1) {
+    // if (flagged) {
+    //   styleField.push(styles.flagged, styles.regular);
+    // }
+    if (!opened && !exploded) {
       styleField.push(styles.regular);
     }
 
@@ -59,6 +65,7 @@ export default class Field extends Component<FieldProps> {
           </Text>
         )}
         {mined && opened && <Mine />}
+        {flagged && !opened && <Flag />}
       </View>
     );
   }

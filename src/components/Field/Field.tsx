@@ -1,5 +1,12 @@
 import React, {Component} from 'react';
-import {View, StyleSheet, TextStyle, ViewStyle, Text} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TextStyle,
+  ViewStyle,
+  Text,
+  TouchableWithoutFeedback,
+} from 'react-native';
 import params from '../../utils/params';
 import Mine from '../Mine/Mine';
 import Flag from '../Flag/Flag';
@@ -10,6 +17,8 @@ type FieldProps = {
   nearMines?: number;
   exploded?: boolean;
   flagged?: boolean;
+  onOpen: () => void;
+  onSelect: () => void;
 };
 
 export default class Field extends Component<FieldProps> {
@@ -58,15 +67,19 @@ export default class Field extends Component<FieldProps> {
     }
 
     return (
-      <View style={styleField}>
-        {!mined && opened && nearMines > 0 && (
-          <Text style={[styles.label, {color: color as string}]}>
-            {nearMines}
-          </Text>
-        )}
-        {mined && opened && <Mine />}
-        {flagged && !opened && <Flag />}
-      </View>
+      <TouchableWithoutFeedback
+        onPress={this.props.onOpen}
+        onLongPress={this.props.onSelect}>
+        <View style={styleField}>
+          {!mined && opened && nearMines > 0 && (
+            <Text style={[styles.label, {color: color as string}]}>
+              {nearMines}
+            </Text>
+          )}
+          {mined && opened && <Mine />}
+          {flagged && !opened && <Flag />}
+        </View>
+      </TouchableWithoutFeedback>
     );
   }
 }

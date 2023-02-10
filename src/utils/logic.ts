@@ -91,6 +91,11 @@ const safeNeighborhood = (board: BoardProps, row: number, column: number) => {
 
 export const openField = (board: BoardProps, row: number, column: number) => {
   const field = board[row][column];
+
+  if (field.flagged || hadExplosion(board) || wonGame(board)) {
+    return false;
+  }
+
   if (!field.opened) {
     field.opened = true;
     if (field.mined) {
@@ -106,6 +111,8 @@ export const openField = (board: BoardProps, row: number, column: number) => {
       ).length;
     }
   }
+
+  return true;
 };
 
 const fields = (board: any) => [].concat(...board);
@@ -123,3 +130,16 @@ export const showMines = (board: BoardProps) =>
   fields(board)
     .filter((field: BoardProps[0][0]) => field.mined)
     .forEach((field: BoardProps[0][0]) => (field.opened = true));
+
+export const invertFlag = (board: BoardProps, row: number, column: number) => {
+  const field = board[row][column];
+
+  if (!field.opened) {
+    field.flagged = !field.flagged;
+  }
+};
+
+export const flagsUsed = (board: BoardProps): number => {
+  return fields(board).filter((field: BoardProps[0][0]) => field.flagged)
+    .length;
+};

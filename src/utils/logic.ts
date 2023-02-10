@@ -57,7 +57,7 @@ export const createMinedBoard = (
   return board;
 };
 
-const cloneBoard = (board: BoardProps) => {
+export const cloneBoard = (board: BoardProps) => {
   return board.map(rows => {
     return rows.map(field => {
       return {...field};
@@ -88,3 +88,38 @@ const safeNeighborhood = (board: BoardProps, row: number, column: number) => {
     result && !neighbor.mined;
   return getNeighbors(board, row, column).reduce(safes, true);
 };
+
+export const openField = (board: BoardProps, row: number, column: number) => {
+  const field = board[row][column];
+  if (!field.opened) {
+    field.opened = true;
+    if (field.mined) {
+      field.exploded = true;
+    } else if (safeNeighborhood(board, row, column)) {
+      getNeighbors(board, row, column).forEach((n: BoardProps[0][0]) =>
+        openField(board, n.row, n.column),
+      );
+    } else {
+      const neighbors = getNeighbors(board, row, column);
+      field.nearMines = neighbors.filter(
+        (n: BoardProps[0][0]) => n.mined,
+      ).length;
+    }
+  }
+};
+
+const fields = (board: any) => [].concat(...board);
+
+export const hadExplosion = (board: BoardProps) =>
+  fields(board).filter((field: BoardProps[0][0]) => field.exploded).length > 0;
+
+const pendding = (field: BoardProps[0][0]) =>
+  (field.mined && !field.flagged) || (!field.mined && !field.opened);
+
+export const wonGame = (board: BoardProps) =>
+  fields(board).filter(pendding).length === 0;
+
+export const showMines = (board: BoardProps) =>
+  fields(board)
+    .filter((field: BoardProps[0][0]) => field.mined)
+    .forEach((field: BoardProps[0][0]) => (field.opened = true));
